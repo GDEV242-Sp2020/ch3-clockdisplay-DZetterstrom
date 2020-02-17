@@ -16,7 +16,8 @@ public class ClockDisplay
 {
     private NumberDisplay hours;
     private NumberDisplay minutes;
-    private String displayString;    // simulates the actual display
+    private String displayString; // simulates the actual display
+    private String amPM;
     
     /**
      * Constructor for ClockDisplay objects. This constructor 
@@ -24,9 +25,10 @@ public class ClockDisplay
      */
     public ClockDisplay()
     {
-        hours = new NumberDisplay(24);
+        hours = new NumberDisplay(12);
         minutes = new NumberDisplay(60);
-        updateDisplay();
+        amPM = "AM";
+        get12HourInternalDisplay();
     }
 
     /**
@@ -34,11 +36,12 @@ public class ClockDisplay
      * creates a new clock set at the time specified by the 
      * parameters.
      */
-    public ClockDisplay(int hour, int minute)
+    public ClockDisplay(int hour, int minute, String meridian)
     {
-        hours = new NumberDisplay(24);
+        hours = new NumberDisplay(12);
         minutes = new NumberDisplay(60);
-        setTime(hour, minute);
+        amPM = meridian;
+        setTime(hour, minute, meridian);
     }
 
     /**
@@ -49,20 +52,30 @@ public class ClockDisplay
     {
         minutes.increment();
         if(minutes.getValue() == 0) {  // it just rolled over!
-            hours.increment();
+            if(hours.getValue() == 11){
+                hours.increment();
+                if(amPM == "AM"){
+                    amPM = "PM";
+                }else{
+                    amPM = "AM";
+                }
+            }else{
+                hours.increment();
+            }
         }
-        updateDisplay();
+        get12HourInternalDisplay();
     }
 
     /**
      * Set the time of the display to the specified hour and
      * minute.
      */
-    public void setTime(int hour, int minute)
+    public void setTime(int hour, int minute, String meridian)
     {
         hours.setValue(hour);
         minutes.setValue(minute);
-        updateDisplay();
+        amPM = meridian;
+        get12HourInternalDisplay();
     }
 
     /**
@@ -80,5 +93,14 @@ public class ClockDisplay
     {
         displayString = hours.getDisplayValue() + ":" + 
                         minutes.getDisplayValue();
+    }
+    
+    private void get12HourInternalDisplay(){
+        if(hours.getValue() == 0){
+            displayString = "12:" + minutes.getDisplayValue() + amPM;
+        }else{
+            displayString = hours.getDisplayValue() + ":" + 
+                        minutes.getDisplayValue() + amPM;
+        }
     }
 }
